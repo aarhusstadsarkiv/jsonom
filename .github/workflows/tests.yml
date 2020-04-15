@@ -3,8 +3,8 @@ name: Tests
 on: [push]
 
 jobs:
-  lint:
-    name: Check linting
+  check:
+    name: Check linting & types
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 
@@ -32,5 +32,6 @@ jobs:
       - name: Run flake8 & black
         run: |
           source $HOME/.poetry/env
-          poetry run flake8 --exclude .venv
-          poetry run black --check . --exclude .venv
+          poetry run flake8
+          poetry run black --check .
+          poetry run mypy .
