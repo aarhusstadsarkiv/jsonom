@@ -1,8 +1,10 @@
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------
-import re
+
 from bs4 import BeautifulSoup
+
+import pytest
 from jsonom.get_data import PronomData
 
 # -----------------------------------------------------------------------------
@@ -31,10 +33,6 @@ class TestPronomDataMethods:
             "contains multiple signatures that were released at the same time."
             in self.pronom.text()
         )
-        assert re.search(
-            r'Version="12" DateCreated="2006-08-23T14:52:24"',
-            self.pronom.text("documents/DROID_SignatureFile_V12.xml"),
-        )
 
     def test_soup(self):
         assert isinstance(self.pronom.soup(), BeautifulSoup)
@@ -42,3 +40,29 @@ class TestPronomDataMethods:
             self.pronom.soup().title.get_text().strip()
             == "The National Archives | PRONOM | DROID signatures"
         )
+
+    def test_latest_file(self):
+        # Signature file
+        sig_file = self.pronom.latest_file("signature")
+        sig_keys = sig_file["FFSignatureFile"].keys()
+        assert "@DateCreated" in sig_keys
+        assert "@Version" in sig_keys
+        assert "@xmlns" in sig_keys
+        assert "InternalSignatureCollection" in sig_keys
+        assert "FileFormatCollection" in sig_keys
+
+        # Container file
+        cont_file = self.pronom.latest_file("container")
+        cont_keys = cont_file["ContainerSignatureMapping"].keys()
+        assert "@schemaVersion" in cont_keys
+        assert "@signatureVersion" in cont_keys
+        assert "ContainerSignatures" in cont_keys
+        assert "FileFormatMappings" in cont_keys
+        assert "TriggerPuids" in cont_keys
+
+        # Wrong input - it won't type check, which is nice :)
+        with pytest.raises(
+            ValueError,
+            match="file_type must be either signature or container.",
+        ):
+            self.pronom.latest_file("fail")  # type: ignore
