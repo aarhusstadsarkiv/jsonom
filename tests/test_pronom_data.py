@@ -5,7 +5,7 @@
 from bs4 import BeautifulSoup
 
 import pytest
-from jsonom.get_data import PronomData
+from jsonom import PronomData
 
 # -----------------------------------------------------------------------------
 # Tests
