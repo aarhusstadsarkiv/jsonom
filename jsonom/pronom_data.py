@@ -7,7 +7,8 @@ from typing import Any, Dict, Literal, Pattern
 
 import requests
 from bs4 import BeautifulSoup
-from requests import Response
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 import xmltodict
 
@@ -17,19 +18,25 @@ import xmltodict
 
 
 class PronomData:
-    """Get BeautifulSoup and text objects from PRONOM."""
+    """Get BeautifulSoup and raw data from PRONOM."""
 
     base_url = "https://www.nationalarchives.gov.uk"
 
     def __init__(self, url: str):
         self.url = url.strip("/")
+        self.session = requests.Session()
 
-    def text(self) -> str:
-        response_data: Response = requests.get(f"{self.base_url}/{self.url}")
-        return response_data.text
+        # Mount baseurl session with retries
+        _retries: Retry = Retry(
+            total=5, backoff_factor=0.1, status_forcelist=[500, 502, 503, 504]
+        )
+        self.session.mount(self.base_url, HTTPAdapter(max_retries=_retries))
+
+    def raw_data(self) -> str:
+        return self.session.get(f"{self.base_url}/{self.url}").text
 
     def soup(self) -> BeautifulSoup:
-        return BeautifulSoup(self.text(), features="html.parser")
+        return BeautifulSoup(self.raw_data(), features="html.parser")
 
     def latest_file(
         self, file_type: Literal["signature", "container"]
@@ -44,6 +51,6 @@ class PronomData:
                 "file_type must be either signature or container."
             )
         link: str = self.soup().find_all(href=href_match)[-1].get("href")
-        link_data: str = requests.get(f"{self.base_url}/{link}").text
+        link_data: str = self.session.get(f"{self.base_url}/{link}").text
         latest_file: Dict[Any, Any] = xmltodict.parse(link_data)
         return latest_file
