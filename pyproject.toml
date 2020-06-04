@@ -19,7 +19,7 @@ urllib3 = "^1.25.9"
 pytest = "^5.4"
 pytest-cov = "^2.9"
 black = "^19.10b0"
-flake8 = "^3.8.1"
+flake8 = "^3.8.2"
 mypy = "^0.780"
 
 [tool.black]
