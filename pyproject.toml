@@ -10,17 +10,17 @@ homepage = "https://www.aarhusstadsarkiv.dk/"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-beautifulsoup4 = "^4.9.0"
-requests = "^2.23.0"
+beautifulsoup4 = "^4.9.1"
+requests = "^2.24.0"
 xmltodict = "^0.12.0"
 urllib3 = "^1.25.9"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-pytest-cov = "^2.8"
+pytest = "^5.4"
+pytest-cov = "^2.10"
 black = "^19.10b0"
-flake8 = "^3.7.9"
-mypy = "^0.770"
+flake8 = "^3.8.3"
+mypy = "^0.780"
 
 [tool.black]
 line-length = 79
