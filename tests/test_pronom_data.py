@@ -2,6 +2,9 @@
 # Imports
 # -----------------------------------------------------------------------------
 
+import json
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
 import pytest
@@ -12,17 +15,20 @@ from jsonom import PronomData
 # -----------------------------------------------------------------------------
 
 
+def write_data(data, file_name) -> None:
+    test_out = Path(__file__).parent / "test_data"
+    Path(test_out, file_name).write_text(json.dumps(data, indent=2))
+
+
 class TestPronomData:
     def test_init(self):
-        pronom_data = PronomData("test")
+        pronom_data = PronomData()
         assert pronom_data.base_url == "https://www.nationalarchives.gov.uk"
-        assert pronom_data.url == "test"
-        pronom_data = PronomData("/test")
-        assert pronom_data.url == "test"
+        assert pronom_data.url == "aboutapps/pronom/droid-signature-files.htm"
 
 
 class TestPronomDataMethods:
-    pronom = PronomData("aboutapps/pronom/droid-signature-files.htm")
+    pronom = PronomData()
 
     def test_raw_data(self):
         assert (
@@ -50,6 +56,7 @@ class TestPronomDataMethods:
         assert "@xmlns" in sig_keys
         assert "InternalSignatureCollection" in sig_keys
         assert "FileFormatCollection" in sig_keys
+        write_data(sig_file, "signature.json")
 
         # Container file
         cont_file = self.pronom.latest_file("container")
@@ -59,6 +66,7 @@ class TestPronomDataMethods:
         assert "ContainerSignatures" in cont_keys
         assert "FileFormatMappings" in cont_keys
         assert "TriggerPuids" in cont_keys
+        write_data(cont_file, "container.json")
 
         # Wrong input - it won't type check, which is nice :)
         with pytest.raises(

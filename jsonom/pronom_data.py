@@ -5,8 +5,8 @@
 import re
 from typing import Any, Dict, Literal, Pattern
 
-import requests
 from bs4 import BeautifulSoup
+from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -21,10 +21,10 @@ class PronomData:
     """Get BeautifulSoup and raw data from PRONOM."""
 
     base_url = "https://www.nationalarchives.gov.uk"
+    url = "aboutapps/pronom/droid-signature-files.htm"
 
-    def __init__(self, url: str):
-        self.url = url.strip("/")
-        self.session = requests.Session()
+    def __init__(self) -> None:
+        self.session: Session = Session()
 
         # Mount baseurl session with retries
         _retries: Retry = Retry(
