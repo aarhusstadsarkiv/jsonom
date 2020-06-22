@@ -3,8 +3,9 @@
 # -----------------------------------------------------------------------------
 
 import re
-from typing import Any, Dict, Literal, Pattern
+from typing import Any, Dict, Literal, Pattern, Optional, List, Union
 
+from pydantic import BaseModel
 from bs4 import BeautifulSoup
 from requests import Session
 from requests.adapters import HTTPAdapter
@@ -54,3 +55,13 @@ class PronomData:
         link_data: str = self.session.get(f"{self.base_url}/{link}").text
         latest_file: Dict[Any, Any] = xmltodict.parse(link_data)
         return latest_file
+
+
+class FileFormat(BaseModel):
+    id: int
+    name: str
+    puid: str
+    extension: Union[str, List[str]]
+    internalsignatureid: Optional[Union[str, List[str]]]
+    version: Optional[str]
+    haspriorityoverfileformatid: Optional[List[str]]
