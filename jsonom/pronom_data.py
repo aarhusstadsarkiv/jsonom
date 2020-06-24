@@ -3,7 +3,7 @@
 # -----------------------------------------------------------------------------
 
 import re
-from typing import Any, Dict, Literal, Pattern, Optional, List, Union
+from typing import Any, Dict, Literal, Pattern, Optional, List
 
 from pydantic import BaseModel
 from bs4 import BeautifulSoup
@@ -61,7 +61,16 @@ class FileFormat(BaseModel):
     id: int
     name: str
     puid: str
-    extension: Union[str, List[str]]
-    internalsignatureid: Optional[Union[str, List[str]]]
+    extension: Optional[List[str]]
+    mime_type: Optional[str]
+    internal_signature_id: Optional[List[str]]
     version: Optional[str]
-    haspriorityoverfileformatid: Optional[List[str]]
+    has_priority_over_file_format_id: Optional[List[str]]
+
+    class Config:
+        extra = "forbid"
+
+        @classmethod
+        def alias_generator(cls, string: str) -> str:
+            # this is the same as `alias_generator = to_camel` above
+            return "".join(word.capitalize() for word in string.split("_"))
